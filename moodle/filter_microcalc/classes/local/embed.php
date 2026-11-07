@@ -90,7 +90,8 @@ class embed {
 
         $query = self::style_query($atts);
         $query['src'] = 'moodle';
-        $src = $item['widget_src'] . (strpos($item['widget_src'], '?') === false ? '?' : '&') . http_build_query($query);
+        // разделитель задан явно: Moodle задаёт arg_separator.output = &amp;, и адрес экранировался бы дважды
+        $src = $item['widget_src'] . (strpos($item['widget_src'], '?') === false ? '?' : '&') . http_build_query($query, '', '&');
         $width = max(0, (int)($atts['width'] ?? 0));
 
         $html = '<div class="calc-widget" data-src="' . s($src) . '"' . ($width ? ' style="max-width:' . $width . 'px"' : '') . '></div>' . "\n"

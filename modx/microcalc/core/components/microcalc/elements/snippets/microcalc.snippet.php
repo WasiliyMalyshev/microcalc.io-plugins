@@ -119,7 +119,8 @@ foreach (['head', 'frame'] as $k) {
     }
 }
 $q['src'] = 'modx';
-$src = $widgetSrc . (strpos($widgetSrc, '?') === false ? '?' : '&') . http_build_query($q);
+// разделитель задан явно: часть хостингов задаёт arg_separator.output = &amp;, и адрес экранировался бы дважды
+$src = $widgetSrc . (strpos($widgetSrc, '?') === false ? '?' : '&') . http_build_query($q, '', '&');
 $width = max(0, (int) ($p['width'] ?? 0));
 $e = function ($s) {
     return htmlspecialchars((string) $s, ENT_QUOTES, 'UTF-8');

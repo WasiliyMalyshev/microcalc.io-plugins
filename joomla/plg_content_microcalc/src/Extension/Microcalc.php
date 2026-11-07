@@ -105,7 +105,8 @@ final class Microcalc extends CMSPlugin implements SubscriberInterface
 
 		$query        = $this->styleQuery($atts);
 		$query['src'] = 'joomla';
-		$src          = $item['widget_src'] . (strpos($item['widget_src'], '?') === false ? '?' : '&') . http_build_query($query);
+		// разделитель задан явно: часть хостингов задаёт arg_separator.output = &amp;, и адрес экранировался бы дважды
+		$src          = $item['widget_src'] . (strpos($item['widget_src'], '?') === false ? '?' : '&') . http_build_query($query, '', '&');
 		$width        = max(0, (int) ($atts['width'] ?? 0));
 		$e            = fn ($s) => htmlspecialchars((string) $s, ENT_QUOTES, 'UTF-8');
 
