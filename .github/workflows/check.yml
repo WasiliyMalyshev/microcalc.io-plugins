@@ -1,0 +1,43 @@
+name: check
+
+on:
+  push:
+    branches: [main]
+    tags: ['v*']
+  pull_request:
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        php: ['7.4', '8.3']
+    steps:
+      - uses: actions/checkout@v4
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php }}
+          tools: none
+      - name: PHP syntax
+        run: find . -name '*.php' -not -path './dist/*' -print0 | xargs -0 -n1 php -l
+      - name: JSON and XML
+        run: |
+          python3 -m json.tool wordpress/microcalc-widget/blocks/widget/block.json > /dev/null
+          python3 -c "import xml.dom.minidom,sys; xml.dom.minidom.parse('joomla/plg_content_microcalc/microcalc.xml')"
+      - name: Translations
+        run: |
+          sudo apt-get install -y -q gettext > /dev/null
+          for f in wordpress/microcalc-widget/languages/*.po; do msgfmt --check -o /dev/null "$f"; done
+
+  release:
+    needs: lint
+    if: startsWith(github.ref, 'refs/tags/v')
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - run: sh tools/build.sh
+      - uses: softprops/action-gh-release@v2
+        with:
+          files: dist/*.zip
